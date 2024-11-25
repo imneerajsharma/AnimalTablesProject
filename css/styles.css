@@ -1,4 +1,88 @@
-img:hover {
-    transform: scale(1.2);
-    border: 2px solid black;
+
+
+/* Add hover effect for images */
+img.zoomable {
+    width: 100px;
+    height: auto;
+    transition: transform 0.3s ease, border 0.3s ease; /* Smooth transition */
+}
+
+img.zoomable:hover {
+    transform: scale(1.5); /* Zoom effect */
+    border: 4px solid black; /* Add a border for emphasis */
+}
+
+/* General styling for the page */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    margin: 0; /* Reset default margins */
+    padding: 0;
+    box-sizing: border-box;
+    display: flex; /* Ensure the body centers the container */
+    justify-content: center; /* Center the container horizontally */
+}
+
+/* Center and constrain the layout */
+.container {
+    max-width: 960px;
+    width: 70%; /* Allow responsiveness for smaller screens */
+    min-width: 320px; /* Prevent too narrow on small screens */
+    margin: 20px auto; /* Centered with spacing */
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for modals */
+.modal-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.modal-title {
+    font-size: 1.2rem;
+}
+
+.modal-footer .btn {
+    font-size: 1rem;
+    padding: 10px 15px;
+}
+
+/* Optimize table layout for small screens */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .modal-dialog {
+        margin: 10px auto;
+    }
+
+    table th, table td {
+        font-size: 0.8rem;
+    }
+}
+
+/* Further optimization for very small screens */
+@media (max-width: 576px) {
+    .btn {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+
+    .modal-dialog {
+        max-width: 95%;
+    }
+
+    table th, table td {
+        font-size: 0.75rem;
+    }
 }
