@@ -155,45 +155,126 @@ class AnimalTable {
         this.renderTable();
     }
 
+    // editEntry(index) {
+    //     const entry = this.data[index];
+    //     const newEntry = prompt("Edit entry (JSON format):", JSON.stringify(entry));
+    //     if (newEntry) {
+    //         try {
+    //             this.data[index] = JSON.parse(newEntry);
+    //             this.renderTable();
+    //         } catch (err) {
+    //             alert("Invalid JSON format!");
+    //         }
+    //     }
+    // }
     editEntry(index) {
+        // Show the modal
+        const editAnimalModal = new bootstrap.Modal(document.getElementById("editAnimalModal"));
         const entry = this.data[index];
-        const newEntry = prompt("Edit entry (JSON format):", JSON.stringify(entry));
-        if (newEntry) {
-            try {
-                this.data[index] = JSON.parse(newEntry);
+    
+        // Pre-fill the form with the existing data
+        document.getElementById("editSpecies").value = entry.species;
+        document.getElementById("editName").value = entry.name;
+        document.getElementById("editSize").value = entry.size;
+        document.getElementById("editLocation").value = entry.location;
+        document.getElementById("editImage").value = entry.image;
+    
+        editAnimalModal.show();
+    
+        // Handle form submission
+        const form = document.getElementById("editAnimalForm");
+        form.onsubmit = (e) => {
+            e.preventDefault();
+    
+            // Collect updated data from the form
+            const updatedEntry = {
+                species: document.getElementById("editSpecies").value.trim(),
+                name: document.getElementById("editName").value.trim(),
+                size: document.getElementById("editSize").value.trim(),
+                location: document.getElementById("editLocation").value.trim(),
+                image: document.getElementById("editImage").value.trim(),
+            };
+    
+            // Validate and update the entry
+            if (this.validateEntry(updatedEntry, index)) {
+                this.data[index] = updatedEntry;
                 this.renderTable();
-            } catch (err) {
-                alert("Invalid JSON format!");
+                editAnimalModal.hide();
+            } else {
+                alert("Duplicate entry or invalid format!");
             }
-        }
+        };
     }
+    
+
+    // addEntry() {
+    //     const newEntry = prompt("Add new entry (JSON format):");
+    //     if (newEntry) {
+    //         try {
+    //             const entry = JSON.parse(newEntry);
+    //             if (this.validateEntry(entry)) {
+    //                 this.data.push(entry);
+    //                 this.renderTable();
+    //             } else {
+    //                 alert("Duplicate entry or invalid format!");
+    //             }
+    //         } catch (err) {
+    //             alert("Invalid JSON format!");
+    //         }
+    //     }
+    // }
 
     addEntry() {
-        const newEntry = prompt("Add new entry (JSON format):");
-        if (newEntry) {
-            try {
-                const entry = JSON.parse(newEntry);
-                if (this.validateEntry(entry)) {
-                    this.data.push(entry);
-                    this.renderTable();
-                } else {
-                    alert("Duplicate entry or invalid format!");
-                }
-            } catch (err) {
-                alert("Invalid JSON format!");
+        // Show the modal
+        const addAnimalModal = new bootstrap.Modal(document.getElementById("addAnimalModal"));
+        addAnimalModal.show();
+    
+        // Handle form submission
+        const form = document.getElementById("addAnimalForm");
+        form.onsubmit = (e) => {
+            e.preventDefault();
+    
+            // Collect data from the form
+            const newEntry = {
+                species: document.getElementById("species").value.trim(),
+                name: document.getElementById("name").value.trim(),
+                size: document.getElementById("size").value.trim(),
+                location: document.getElementById("location").value.trim(),
+                image: document.getElementById("image").value.trim(),
+            };
+    
+            // Validate and add the new entry
+            if (this.validateEntry(newEntry)) {
+                this.data.push(newEntry);
+                this.renderTable();
+                addAnimalModal.hide();
+                form.reset(); // Clear the form
+            } else {
+                alert("Duplicate entry or invalid format!");
             }
-        }
+        };
     }
+    
 
-    validateEntry(entry) {
+    // validateEntry(entry) {
+    //     // Validate that the entry is unique and has all required fields
+    //     const requiredFields = Object.keys(this.data[0]);
+    //     const isValid = requiredFields.every((key) => entry.hasOwnProperty(key));
+    //     const isDuplicate = this.data.some((row) =>
+    //         requiredFields.every((key) => row[key] === entry[key])
+    //     );
+    //     return isValid && !isDuplicate;
+    // }
+    validateEntry(entry, excludeIndex = -1) {
         // Validate that the entry is unique and has all required fields
         const requiredFields = Object.keys(this.data[0]);
         const isValid = requiredFields.every((key) => entry.hasOwnProperty(key));
-        const isDuplicate = this.data.some((row) =>
-            requiredFields.every((key) => row[key] === entry[key])
+        const isDuplicate = this.data.some((row, index) =>
+            index !== excludeIndex && requiredFields.every((key) => row[key] === entry[key])
         );
         return isValid && !isDuplicate;
     }
+    
 }
 
 // Example data initialization
