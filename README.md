@@ -1,5 +1,11 @@
 # Animal Tables Application
 
+## Screenshot :
+<img width="1622" alt="image" src="https://github.com/user-attachments/assets/6873bb9a-7d2b-46f2-810c-859e9b787397">
+
+
+
+
 ## Overview
 The Animal Tables Application is a responsive web app designed to manage animal data in a tabular format. It supports CRUD operations (Create, Read, Update, Delete) on animal data, sorting functionalities, and local storage for data persistence.
 
