@@ -238,14 +238,14 @@ class AnimalTable {
 document.addEventListener("DOMContentLoaded", () => {
     const bigCatsData = [
         { species: "Big Cats", name: "Tiger", size: 10, location: "Asia", image: "images/tiger.png" },
-        { species: "Big Cats", name: "Lion", size: 8, location: "Africa", image: "images/lion.png" },
+        { species: "Big Cats", name: "Lion", size: 8, location: "Africa", image: "images/Lion.png" },
     ];
     const dogsData = [
         { species: "Dog", name: "Rottweiler", size: 2, location: "Germany", image: "images/Rotwailer.png" },
         { species: "Dog", name: "Labrador", size: 2, location: "UK", image: "images/Labrador.png" },
     ];
     const bigFishData = [
-        { species: "Big Fish", name: "Humpback Whale", size: 15, location: "Atlantic Ocean", image: "images/humpbackwhale.png" },
+        { species: "Big Fish", name: "Humpback Whale", size: 15, location: "Atlantic Ocean", image: "images/HumpbackWhale.png" },
         { species: "Big Fish", name: "Killer Whale", size: 12, location: "Atlantic Ocean", image: "images/Killer_Whale.png" },
     ];
 
