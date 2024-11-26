@@ -58,6 +58,13 @@ class AnimalTable {
               html += `<td>
                             <img src="${row[key]}" class="img-thumbnail zoomable" alt="${row.name}" style="width: 100px; height: auto;">
                         </td>`;
+                    } else if (this.tableId === "dogsTable" && key === "name") {
+                        // Bold text for Table 2 (Dogs)
+                        html += `<td><strong>${row[key]}</strong></td>`;
+                    } else if (this.tableId === "bigFishTable" && key === "name") {
+                        // Bold, italic, blue text for Table 3 (Big Fish)
+                        html += `<td><strong><em style="color: blue;">${row[key]}</em></strong></td>`;
+                    
             } else {
               html += `<td>${row[key] || ""}</td>`;
             }
