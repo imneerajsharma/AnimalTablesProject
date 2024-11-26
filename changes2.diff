@@ -1,0 +1,659 @@
+diff --git a/.DS_Store b/.DS_Store
+index a3ba82d..562c6aa 100644
+Binary files a/.DS_Store and b/.DS_Store differ
+diff --git a/README.md b/README.md
+index a6f1a35..4c9d8f2 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,181 @@
+-# AnimalTablesProject
+\ No newline at end of file
++# Animal Tables Application
++
++## Overview
++The Animal Tables Application is a responsive web app designed to manage animal data in a tabular format. It supports CRUD operations (Create, Read, Update, Delete) on animal data, sorting functionalities, and local storage for data persistence.
++
++---
++
++## File Structure
++
++### 1. `index.html`
++The main HTML file containing the structure of the application, including modals for adding and editing animals.
++
++### 2. `style.css`
++The CSS file that styles the application, including table responsiveness and modal designs.
++
++### 3. `script.js`
++The JavaScript file containing the functionality of the application, including table rendering, event handling, and local storage management.
++
++### 4. `manifest.json`
++The manifest file defining metadata for the app, such as name, description, and icons.
++
++---
++
++## Features
++
++- **CRUD Operations**:
++  Add, edit, delete, and view animals in the table.
++  
++- **Responsive Design**:
++  Tables are scrollable on smaller screens.
++
++- **Image Zoom**:
++  Hovering over images zooms them for better visibility.
++
++- **Sorting**:
++  Sortable columns with an icon for better usability.
++
++- **Validation**:
++  Prevents duplicate entries and enforces required fields.
++
++- **Local Storage**:
++  Data is saved in `localStorage`, preserving it between sessions.
++
++---
++
++## Usage Instructions
++
++### 1. **Open the Application**
++   - Open `index.html` in a browser to view the app.
++
++### 2. **Adding a New Animal**
++   - Click the "Add Animal" button.
++   - Fill out the form in the modal and click "Add Animal."
++
++### 3. **Editing an Existing Animal**
++   - Click the "Edit" button next to an animal entry.
++   - Update the fields in the modal and click "Save Changes."
++
++### 4. **Deleting an Animal**
++   - Click the "Delete" button next to an animal entry to remove it.
++
++### 5. **Sorting**
++   - Click the sorting icon in the column headers to sort by that column.
++
++---
++
++## File Details
++
++### 1. `index.html`
++- **Purpose**: The main layout of the application.
++- **Key Components**:
++  - **Container for Tables**:
++    ```html
++    <div class="container my-4">
++        <h1 class="text-center">Animal Tables</h1>
++        <div class="table-responsive" id="bigCatsTable"></div>
++        <div class="table-responsive" id="dogsTable"></div>
++        <div class="table-responsive" id="bigFishTable"></div>
++    </div>
++    ```
++  - **Modals**:
++    - Add Animal Modal
++    - Edit Animal Modal
++    - Error Modal
++  - **Scripts**:
++    Includes Bootstrap and custom JavaScript files:
++    ```html
++    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
++    <script src="js/script.js"></script>
++    ```
++
++---
++
++### 2. `style.css`
++- **Purpose**: Styling for the application.
++- **Key Features**:
++  - **Zoomable Images**:
++    ```css
++    img.zoomable:hover {
++        transform: scale(1.5);
++        border: 4px solid black;
++    }
++    ```
++  - **Table Styling**:
++    ```css
++    table {
++        table-layout: fixed;
++        width: 100%;
++    }
++    th, td {
++        word-wrap: break-word;
++        text-align: center;
++        vertical-align: top;
++    }
++    ```
++  - **Responsive Design**:
++    Ensures tables are scrollable on smaller screens using `.table-responsive`.
++
++---
++
++### 3. `script.js`
++- **Purpose**: Implements functionality for managing animal tables.
++- **Key Methods**:
++  - **Constructor (`AnimalTable`)**:
++    Initializes the table with data, table ID, sortable columns, and count.
++  - **`renderTable()`**:
++    - Dynamically creates table headers and rows.
++    - Adds sorting buttons with images for specific columns.
++  - **`addEventListeners()`**:
++    - Handles sorting, editing, deleting, and adding actions.
++  - **`sort(column)`**:
++    Sorts the table data by the specified column.
++  - **`deleteEntry(index)`**:
++    Deletes an entry from the table based on the index.
++  - **`editEntry(index)`**:
++    Opens the "Edit Animal" modal and pre-fills the data for editing.
++  - **`addEntry()`**:
++    Opens the "Add Animal" modal and handles form submissions to add a new animal.
++  - **`validateEntry(entry, excludeIndex, action)`**:
++    - Validates the data for completeness and checks for duplicates.
++    - Displays an error message using the `showErrorModal()` method if validation fails.
++
++---
++
++### 4. `manifest.json`
++- **Purpose**: Metadata for the web app.
++- **Key Properties**:
++  - **`name`**: Full name of the app ("Animal Tables").
++  - **`short_name`**: Shortened name ("Animals").
++  - **`start_url`**: Entry point of the app (`index.html`).
++  - **`icons`**:
++    Defines app icons in multiple sizes for various devices.
++
++---
++
++## Future Enhancements
++
++- **Image Upload**:
++  Allow users to upload custom images for animals.
++  
++- **Pagination**:
++  Add pagination for large datasets.
++  
++- **Search Functionality**:
++  Enable searching through table data.
++  
++- **Export/Import**:
++  Allow exporting and importing data as JSON or CSV files.
++
++---
++
++## Responsive Design
++
++- Uses Bootstrap for mobile-first responsiveness.
++- Tables automatically become scrollable on smaller screens.
++
++---
++
++## License
++
++This project is open-source and can be used freely under the [MIT License](LICENSE).
+diff --git a/css/styles.css b/css/styles.css
+index 27bdc5f..8513bc4 100644
+--- a/css/styles.css
++++ b/css/styles.css
+@@ -24,6 +24,9 @@ body {
+     justify-content: center; /* Center the container horizontally */
+ }
+ 
++.table-responsive {
++    margin-bottom: 20px; /* Adds spacing between the tables */
++}
+ /* Center and constrain the layout */
+ .container {
+     max-width: 960px;
+@@ -36,6 +39,24 @@ body {
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ 
++/* Specific styles for "Edit" and "Delete" buttons */
++button.edit-btn,
++button.delete-btn {
++    width: 80px; /* Fixed width */
++    height: 36px; /* Fixed height */
++    margin: 5px;
++    padding: 8px 12px;
++    display: inline-block; /* Ensure proper alignment */
++}
++/* Ensure the "Add Animal" button remains unaffected */
++.add-btn {
++    margin-top: 15px;
++    margin-bottom: 15px;
++    padding: 10px 20px; /* Keep the padding larger for distinction */
++}
++
++
++
+ /* Style for modals */
+ .modal-header {
+     background-color: #007bff;
+@@ -51,6 +72,18 @@ body {
+     padding: 10px 15px;
+ }
+ 
++table {
++    table-layout: fixed; /* Ensures fixed width for columns */
++    width: 100%; /* Makes table fill its container */
++}
++
++th, td {
++    word-wrap: break-word; /* Wrap text if it overflows */
++    text-align: center; /* Align text in the center */
++    vertical-align: top; /* Align text to the top */
++}
++
++
+ /* Optimize table layout for small screens */
+ @media (max-width: 768px) {
+     .table-responsive {
+@@ -86,3 +119,5 @@ body {
+         font-size: 0.75rem;
+     }
+ }
++
++
+diff --git a/images/Labrodar.png b/images/Labrodar.png
+deleted file mode 100644
+index a87eab1..0000000
+Binary files a/images/Labrodar.png and /dev/null differ
+diff --git a/index.html b/index.html
+index 0bcfd7e..e51c53b 100644
+--- a/index.html
++++ b/index.html
+@@ -53,10 +53,11 @@
+                 <div class="mb-3">
+                   <label for="image" class="form-label">Image Path</label>
+                   <input type="text" class="form-control" id="image" placeholder="e.g., images/tiger.png" required>
+-                  <p id="error" style="color: red;"></p></p>
++                  <p id="error" style="color: red;"></p>
+                 </div>
+                 <button type="submit" id="add-animal" class="btn btn-primary">Add Animal</button>
+                 
++                
+               </form>
+             </div>
+           </div>
+@@ -105,7 +106,7 @@
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+-                  <h5 class="modal-title" id="errorModalLabel">Duplicate Entry</h5>
++                  <h5 class="modal-title" id="errorModalLabel"></h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+diff --git a/js/script.js b/js/script.js
+index abfead1..f2b5d63 100644
+--- a/js/script.js
++++ b/js/script.js
+@@ -1,19 +1,17 @@
+ class AnimalTable {
+-    constructor(data, tableId, sortColumns,count) {
++    constructor(data, tableId, sortColumns, count) {
+         this.tableId = tableId;
+         this.sortColumns = sortColumns;
+-        
+-        
+ 
+         // Load data from localStorage or use initial data
+         const savedData = localStorage.getItem(this.tableId);
+         this.data = savedData ? JSON.parse(savedData) : data;
+-        
++
+         // Register this table's data globally
+         if (!window.allTablesData) {
+-        window.allTablesData = {};
++            window.allTablesData = {};
+         }
+-    window.allTablesData[this.tableId] = this.data;
++        window.allTablesData[this.tableId] = this.data;
+         this.count = count;
+         this.renderTable();
+     }
+@@ -26,29 +24,32 @@ class AnimalTable {
+     renderTable() {
+         const container = document.getElementById(this.tableId);
+         if (!container) return;
+-    
++
+         // Create table structure
+         let html = '<table class="table table-bordered table-hover">';
+         html += `<thead>Table :${this.count} ${this.data[0].species}<tr>`;
+-        
+-    
++
+         // Create table headers with sorting options
+         for (let key in this.data[0]) {
++            // Convert column name to CamelCase
++            const camelCaseKey = key.charAt(0).toUpperCase() + key.slice(1);
++
+             if (key === "image") {
+-                html += `<th>${key}</th>`;
+-            }
+-            else if( key == "size"){
+-                html += `<th>${key} (in ft's)</th>`;
++                html += `<th class="text-center align-top">${camelCaseKey}</th>`;
++            } else if (key === "size") {
++                html += `<th class="text-center align-top">${camelCaseKey} (in ft's)</th>`;
+             } else if (this.sortColumns.includes(key)) {
+-                html += `<th>${key} 
+-                    <button class="btn btn-sm btn-link sort-btn" data-column="${key}">Sort</button>
++                html += `<th class="text-center align-top">${camelCaseKey} 
++                    <button class="btn btn-link btn-sm sort-btn" data-column="${key}" style="padding: 0;">
++                        <img src="images/sort.png" alt="Sort" style="width: 16px; height: 16px;">
++                    </button>
+                 </th>`;
+             } else {
+-                html += `<th>${key}</th>`;
++                html += `<th class="text-center align-top">${camelCaseKey}</th>`;
+             }
+         }
+-        html += '<th>Actions</th></tr></thead><tbody>';
+-    
++        html += `<th class="text-center align-top">Actions</th>`; // For Actions
++
+         // Render rows
+         this.data.forEach((row, index) => {
+             html += `<tr>`;
+@@ -57,12 +58,6 @@ class AnimalTable {
+                     html += `<td>
+                         <img src="${row[key]}" class="img-thumbnail zoomable" alt="${row.name}" style="width: 100px; height: auto;">
+                     </td>`;
+-                } else if (this.tableId === "dogsTable" && key === "name") {
+-                    // Bold text for Table 2 (Dogs)
+-                    html += `<td><strong>${row[key]}</strong></td>`;
+-                } else if (this.tableId === "bigFishTable" && key === "name") {
+-                    // Bold, italic, blue text for Table 3 (Big Fish)
+-                    html += `<td><strong><em style="color: blue;">${row[key]}</em></strong></td>`;
+                 } else {
+                     html += `<td>${row[key]}</td>`;
+                 }
+@@ -73,15 +68,16 @@ class AnimalTable {
+             </td>`;
+             html += `</tr>`;
+         });
+-    
++
+         html += '</tbody></table>';
+         html += `<button class="btn btn-success btn-sm add-btn">Add Animal</button>`;
++
+         container.innerHTML = html;
+-    
++
+         // Add event listeners
+         this.addEventListeners();
+     }
+-    
++
+     addEventListeners() {
+         const container = document.getElementById(this.tableId);
+ 
+@@ -89,7 +85,7 @@ class AnimalTable {
+         const sortButtons = container.querySelectorAll(".sort-btn");
+         sortButtons.forEach((btn) => {
+             btn.addEventListener("click", (e) => {
+-                const column = e.target.getAttribute("data-column");
++                const column = e.target.closest("button").getAttribute("data-column");
+                 this.sort(column);
+             });
+         });
+@@ -132,22 +128,21 @@ class AnimalTable {
+         // Show the modal
+         const editAnimalModal = new bootstrap.Modal(document.getElementById("editAnimalModal"));
+         const entry = this.data[index];
+-    
++
+         // Pre-fill the form with the existing data
+         document.getElementById("editSpecies").value = entry.species;
+         document.getElementById("editName").value = entry.name;
+         document.getElementById("editSize").value = entry.size;
+         document.getElementById("editLocation").value = entry.location;
+         document.getElementById("editImage").value = entry.image;
+-    
++
+         editAnimalModal.show();
+-    
++
+         // Handle form submission
+         const form = document.getElementById("editAnimalForm");
+         form.onsubmit = (e) => {
+             e.preventDefault();
+-    
+-            // Collect updated data from the form
++
+             const updatedEntry = {
+                 species: document.getElementById("editSpecies").value.trim(),
+                 name: document.getElementById("editName").value.trim(),
+@@ -156,29 +151,24 @@ class AnimalTable {
+                 image: document.getElementById("editImage").value.trim(),
+             };
+ 
++            if (!this.validateEntry(updatedEntry, index, "edit")) return;
+ 
+-            // Stop if validation fails
+-        if (!this.validateEntry(updatedEntry, index)) return;
+-
+-        this.data[index] = updatedEntry;
+-        this.saveToLocalStorage(); // Save to localStorage
+-        this.renderTable();
+-        editAnimalModal.hide();
++            this.data[index] = updatedEntry;
++            this.saveToLocalStorage(); // Save to localStorage
++            this.renderTable();
++            editAnimalModal.hide();
+         };
+     }
+-    
+ 
+     addEntry() {
+         // Show the modal
+         const addAnimalModal = new bootstrap.Modal(document.getElementById("addAnimalModal"));
+         addAnimalModal.show();
+-    
+-        // Handle form submission
++
+         const form = document.getElementById("addAnimalForm");
+         form.onsubmit = (e) => {
+             e.preventDefault();
+-    
+-            // Collect data from the form
++
+             const newEntry = {
+                 species: document.getElementById("species").value.trim(),
+                 name: document.getElementById("name").value.trim(),
+@@ -186,133 +176,86 @@ class AnimalTable {
+                 location: document.getElementById("location").value.trim(),
+                 image: document.getElementById("image").value.trim(),
+             };
++
+             const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+-            const isValidImage =  imageExtensions.includes(newEntry.image);
++            const isValidImage = imageExtensions.some((ext) => newEntry.image.toLowerCase().endsWith(ext.toLowerCase()));
+ 
+             const errorElement = document.getElementById("error");
+-            const addButton = document.getElementById("add-animal");
+-            
+             if (!isValidImage) {
+                 errorElement.textContent = "Invalid image URL. Please enter a valid URL with an image extension.";
+-                addButton.disabled = true; 
+                 return;
+             }
+-            else{
++
++            if (this.validateEntry(newEntry, -1, "add")) {
+                 this.data.push(newEntry);
+-            this.saveToLocalStorage(); // Save to localStorage
+-            this.renderTable();
+-            addAnimalModal.hide();
+-            form.reset();
++                this.saveToLocalStorage();
++                this.renderTable();
++                addAnimalModal.hide();
++                form.reset();
+             }
+-
+-    
+-            // // Validate and add the new entry
+-            // if (this.validateEntry(newEntry)) {
+-            //     this.data.push(newEntry);
+-            //     this.saveToLocalStorage(); // Save to localStorage
+-            //     this.renderTable();
+-            //     addAnimalModal.hide();
+-            //     form.reset(); // Clear the form
+-            // } else {
+-            //     alert("Duplicate entry or invalid format!");
+-            // }
+-            // Stop if validation fails
+-        if (!this.validateEntry(newEntry)) return;
+-
+-        // this.data.push(newEntry);
+-        // this.saveToLocalStorage(); // Save to localStorage
+-        // this.renderTable();
+-        // addAnimalModal.hide();
+-        // form.reset(); // Clear the form
+         };
+     }
+ 
+-validateEntry(entry, excludeIndex = -1) {
+-    const requiredFields = Object.keys(this.data[0]);
+-
+-    // Validate that the entry has all required fields and no empty values
+-    const isValid = requiredFields.every((key) => entry.hasOwnProperty(key) && entry[key].trim().length > 0);
+-    if (!isValid) {
+-        //alert("All fields are required and cannot be empty.");
+-        this.showErrorModal("All fields are required and cannot be empty.");
+-        return false;
+-    }
+-
+-    // Normalize the entry for case-insensitive comparison
+-    const normalizedEntry = {};
+-    requiredFields.forEach((key) => {
+-        normalizedEntry[key] = typeof entry[key] === 'string' ? entry[key].toLowerCase().trim() : entry[key];
+-    });
+-
+-    // Check for duplicates across all tables
+-    const isDuplicate = Object.values(window.allTablesData).some((tableData) =>
+-        tableData.some((row, index) => {
+-            if (tableData === this.data && index === excludeIndex) return false; // Skip current entry during editing
+-
+-            const normalizedRow = {};
+-            requiredFields.forEach((key) => {
+-                normalizedRow[key] = typeof row[key] === 'string' ? row[key].toLowerCase().trim() : row[key];
+-            });
++    validateEntry(entry, excludeIndex = -1, action) {
++        const requiredFields = Object.keys(this.data[0]);
++        const isValid = requiredFields.every((key) => entry[key] && entry[key].trim().length > 0);
++        if (!isValid) {
++            this.showErrorModal("All fields are required.");
++            return false;
++        }
+ 
+-            return requiredFields.every((key) => normalizedRow[key] === normalizedEntry[key]);
+-        })
+-    );
++        const normalizedEntry = {};
++        requiredFields.forEach((key) => {
++            normalizedEntry[key] = entry[key].toLowerCase().trim();
++        });
+ 
+-    if (isDuplicate) {
+-       //alert("Duplicate entry found! The animal is already in the table.");
++        const isDuplicate = Object.values(window.allTablesData).some((tableData) =>
++            tableData.some((row, index) => {
++                if (this.data === tableData && index === excludeIndex) return false;
++                return requiredFields.every((key) => row[key].toLowerCase().trim() === normalizedEntry[key]);
++            })
++        );
++
++        if (isDuplicate) {
++            const errorMessage = action === "add" ? "Duplicate entry found!" : "No changes made.";
++            this.showErrorModal(errorMessage);
++            return false;
++        }
+ 
+-       this.showErrorModal("Duplicate entry found! The animal is already in the table.");
+-       return false;
++        return true;
+     }
+ 
+-    // return !isDuplicate; // Return true only if no duplicate is found
+-    return true; // Validation passed
+-}
+-
+-showErrorModal(message) {
+-    // Set the error message dynamically
+-    const modalBody = document.querySelector("#errorModal .modal-body");
+-    if (modalBody) {
+-        modalBody.textContent = message;
++    showErrorModal(message) {
++        const modalBody = document.querySelector("#errorModal .modal-body");
++        if (modalBody) {
++            modalBody.textContent = message;
++        }
++        const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
++        errorModal.show();
+     }
+-    // Show the modal using Bootstrap's modal API
+-    const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
+-    errorModal.show();
+ }
+ 
+-    
+-    
+-}
+-
+-// Example data initialization
+ document.addEventListener("DOMContentLoaded", () => {
+     const bigCatsData = [
+-        { species: "Big Cats", name: "Tiger", size: "10 ft", location: "Asia", image: "images/tiger.png" },
+-        { species: "Big Cats", name: "Lion", size: "8 ft", location: "Africa", image: "images/Lion.png" }
++        { species: "Big Cats", name: "Tiger", size: 10, location: "Asia", image: "images/tiger.png" },
++        { species: "Big Cats", name: "Lion", size: 8, location: "Africa", image: "images/lion.png" },
+     ];
+     const dogsData = [
+-        { species: "Dog", name: "Rottweiler", size: "2 ft", location: "Germany", image: "images/Rotwailer.png" },
+-        { species: "Dog", name: "Labrador", size: "2 ft", location: "UK", image: "images/Labrodar.png" }
++        { species: "Dog", name: "Rottweiler", size: 2, location: "Germany", image: "images/Rotwailer.png" },
++        { species: "Dog", name: "Labrador", size: 2, location: "UK", image: "images/Labrador.png" },
+     ];
+     const bigFishData = [
+-        { species: "Big Fish", name: "Humpback Whale", size: "15 ft", location: "Atlantic Ocean", image: "images/HumpbackWhale.png" },
+-        { species: "Big Fish", name: "Killer Whale", size: "12 ft", location: "Atlantic Ocean", image: "images/Killer_Whale.png" }
++        { species: "Big Fish", name: "Humpback Whale", size: 15, location: "Atlantic Ocean", image: "images/humpbackwhale.png" },
++        { species: "Big Fish", name: "Killer Whale", size: 12, location: "Atlantic Ocean", image: "images/Killer_Whale.png" },
+     ];
+ 
+-    // new AnimalTable(bigCatsData, "bigCatsTable", ["name", "size", "location"]);
+-    // new AnimalTable(dogsData, "dogsTable", ["name", "location"]);
+-    // new AnimalTable(bigFishData, "bigFishTable", ["size"]);
+-
+     let count = 0;
+-    new AnimalTable(bigCatsData, "bigCatsTable", ["name", "size", "location"],count +=1);
+-    new AnimalTable(dogsData, "dogsTable", ["name", "location"], count +=1);
+-    new AnimalTable(bigFishData, "bigFishTable", ["size"], count +=1);
+-    
+-    
++    new AnimalTable(bigCatsData, "bigCatsTable", ["name", "size", "location"], ++count);
++    new AnimalTable(dogsData, "dogsTable", ["name", "location"], ++count);
++    new AnimalTable(bigFishData, "bigFishTable", ["name", "size", "location"], ++count);
+ });
+ 
+-
+-// Responsive table adjustment for smaller screens
++// Responsive adjustments
+ window.addEventListener("resize", () => {
+     if (window.innerWidth < 768) {
+         document.querySelectorAll(".table").forEach((table) => {
+@@ -321,9 +264,8 @@ window.addEventListener("resize", () => {
+     }
+ });
+ 
+-// Ensure responsiveness on initial load
+ if (window.innerWidth < 768) {
+     document.querySelectorAll(".table").forEach((table) => {
+         table.classList.add("table-responsive");
+     });
+-}
+\ No newline at end of file
++}

@@ -1,19 +1,17 @@
 class AnimalTable {
-    constructor(data, tableId, sortColumns,count) {
+    constructor(data, tableId, sortColumns, count) {
         this.tableId = tableId;
         this.sortColumns = sortColumns;
-        
-        
 
         // Load data from localStorage or use initial data
         const savedData = localStorage.getItem(this.tableId);
         this.data = savedData ? JSON.parse(savedData) : data;
-        
+
         // Register this table's data globally
         if (!window.allTablesData) {
-        window.allTablesData = {};
+            window.allTablesData = {};
         }
-    window.allTablesData[this.tableId] = this.data;
+        window.allTablesData[this.tableId] = this.data;
         this.count = count;
         this.renderTable();
     }
@@ -26,29 +24,32 @@ class AnimalTable {
     renderTable() {
         const container = document.getElementById(this.tableId);
         if (!container) return;
-    
+
         // Create table structure
         let html = '<table class="table table-bordered table-hover">';
         html += `<thead>Table :${this.count} ${this.data[0].species}<tr>`;
-        
-    
+
         // Create table headers with sorting options
         for (let key in this.data[0]) {
+            // Convert column name to CamelCase
+            const camelCaseKey = key.charAt(0).toUpperCase() + key.slice(1);
+
             if (key === "image") {
-                html += `<th>${key}</th>`;
-            }
-            else if( key == "size"){
-                html += `<th>${key} (in ft's)</th>`;
+                html += `<th class="text-center align-top">${camelCaseKey}</th>`;
+            } else if (key === "size") {
+                html += `<th class="text-center align-top">${camelCaseKey} (in ft's)</th>`;
             } else if (this.sortColumns.includes(key)) {
-                html += `<th>${key} 
-                    <button class="btn btn-sm btn-link sort-btn" data-column="${key}">Sort</button>
+                html += `<th class="text-center align-top">${camelCaseKey} 
+                    <button class="btn btn-link btn-sm sort-btn" data-column="${key}" style="padding: 0;">
+                        <img src="images/sort.png" alt="Sort" style="width: 16px; height: 16px;">
+                    </button>
                 </th>`;
             } else {
-                html += `<th>${key}</th>`;
+                html += `<th class="text-center align-top">${camelCaseKey}</th>`;
             }
         }
-        html += '<th>Actions</th></tr></thead><tbody>';
-    
+        html += `<th class="text-center align-top">Actions</th>`; // For Actions
+
         // Render rows
         this.data.forEach((row, index) => {
             html += `<tr>`;
@@ -57,12 +58,6 @@ class AnimalTable {
                     html += `<td>
                         <img src="${row[key]}" class="img-thumbnail zoomable" alt="${row.name}" style="width: 100px; height: auto;">
                     </td>`;
-                } else if (this.tableId === "dogsTable" && key === "name") {
-                    // Bold text for Table 2 (Dogs)
-                    html += `<td><strong>${row[key]}</strong></td>`;
-                } else if (this.tableId === "bigFishTable" && key === "name") {
-                    // Bold, italic, blue text for Table 3 (Big Fish)
-                    html += `<td><strong><em style="color: blue;">${row[key]}</em></strong></td>`;
                 } else {
                     html += `<td>${row[key]}</td>`;
                 }
@@ -73,15 +68,16 @@ class AnimalTable {
             </td>`;
             html += `</tr>`;
         });
-    
+
         html += '</tbody></table>';
         html += `<button class="btn btn-success btn-sm add-btn">Add Animal</button>`;
+
         container.innerHTML = html;
-    
+
         // Add event listeners
         this.addEventListeners();
     }
-    
+
     addEventListeners() {
         const container = document.getElementById(this.tableId);
 
@@ -89,7 +85,7 @@ class AnimalTable {
         const sortButtons = container.querySelectorAll(".sort-btn");
         sortButtons.forEach((btn) => {
             btn.addEventListener("click", (e) => {
-                const column = e.target.getAttribute("data-column");
+                const column = e.target.closest("button").getAttribute("data-column");
                 this.sort(column);
             });
         });
@@ -132,22 +128,21 @@ class AnimalTable {
         // Show the modal
         const editAnimalModal = new bootstrap.Modal(document.getElementById("editAnimalModal"));
         const entry = this.data[index];
-    
+
         // Pre-fill the form with the existing data
         document.getElementById("editSpecies").value = entry.species;
         document.getElementById("editName").value = entry.name;
         document.getElementById("editSize").value = entry.size;
         document.getElementById("editLocation").value = entry.location;
         document.getElementById("editImage").value = entry.image;
-    
+
         editAnimalModal.show();
-    
+
         // Handle form submission
         const form = document.getElementById("editAnimalForm");
         form.onsubmit = (e) => {
             e.preventDefault();
-    
-            // Collect updated data from the form
+
             const updatedEntry = {
                 species: document.getElementById("editSpecies").value.trim(),
                 name: document.getElementById("editName").value.trim(),
@@ -156,29 +151,24 @@ class AnimalTable {
                 image: document.getElementById("editImage").value.trim(),
             };
 
+            if (!this.validateEntry(updatedEntry, index, "edit")) return;
 
-            // Stop if validation fails
-        if (!this.validateEntry(updatedEntry, index)) return;
-
-        this.data[index] = updatedEntry;
-        this.saveToLocalStorage(); // Save to localStorage
-        this.renderTable();
-        editAnimalModal.hide();
+            this.data[index] = updatedEntry;
+            this.saveToLocalStorage(); // Save to localStorage
+            this.renderTable();
+            editAnimalModal.hide();
         };
     }
-    
 
     addEntry() {
         // Show the modal
         const addAnimalModal = new bootstrap.Modal(document.getElementById("addAnimalModal"));
         addAnimalModal.show();
-    
-        // Handle form submission
+
         const form = document.getElementById("addAnimalForm");
         form.onsubmit = (e) => {
             e.preventDefault();
-    
-            // Collect data from the form
+
             const newEntry = {
                 species: document.getElementById("species").value.trim(),
                 name: document.getElementById("name").value.trim(),
@@ -186,133 +176,86 @@ class AnimalTable {
                 location: document.getElementById("location").value.trim(),
                 image: document.getElementById("image").value.trim(),
             };
+
             const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
-            const isValidImage =  imageExtensions.includes(newEntry.image);
+            const isValidImage = imageExtensions.some((ext) => newEntry.image.toLowerCase().endsWith(ext.toLowerCase()));
 
             const errorElement = document.getElementById("error");
-            const addButton = document.getElementById("add-animal");
-            
             if (!isValidImage) {
                 errorElement.textContent = "Invalid image URL. Please enter a valid URL with an image extension.";
-                addButton.disabled = true; 
                 return;
             }
-            else{
+
+            if (this.validateEntry(newEntry, -1, "add")) {
                 this.data.push(newEntry);
-            this.saveToLocalStorage(); // Save to localStorage
-            this.renderTable();
-            addAnimalModal.hide();
-            form.reset();
+                this.saveToLocalStorage();
+                this.renderTable();
+                addAnimalModal.hide();
+                form.reset();
             }
-
-    
-            // // Validate and add the new entry
-            // if (this.validateEntry(newEntry)) {
-            //     this.data.push(newEntry);
-            //     this.saveToLocalStorage(); // Save to localStorage
-            //     this.renderTable();
-            //     addAnimalModal.hide();
-            //     form.reset(); // Clear the form
-            // } else {
-            //     alert("Duplicate entry or invalid format!");
-            // }
-            // Stop if validation fails
-        if (!this.validateEntry(newEntry)) return;
-
-        // this.data.push(newEntry);
-        // this.saveToLocalStorage(); // Save to localStorage
-        // this.renderTable();
-        // addAnimalModal.hide();
-        // form.reset(); // Clear the form
         };
     }
 
-validateEntry(entry, excludeIndex = -1) {
-    const requiredFields = Object.keys(this.data[0]);
+    validateEntry(entry, excludeIndex = -1, action) {
+        const requiredFields = Object.keys(this.data[0]);
+        const isValid = requiredFields.every((key) => entry[key] && entry[key].trim().length > 0);
+        if (!isValid) {
+            this.showErrorModal("All fields are required.");
+            return false;
+        }
 
-    // Validate that the entry has all required fields and no empty values
-    const isValid = requiredFields.every((key) => entry.hasOwnProperty(key) && entry[key].trim().length > 0);
-    if (!isValid) {
-        //alert("All fields are required and cannot be empty.");
-        this.showErrorModal("All fields are required and cannot be empty.");
-        return false;
+        const normalizedEntry = {};
+        requiredFields.forEach((key) => {
+            normalizedEntry[key] = entry[key].toLowerCase().trim();
+        });
+
+        const isDuplicate = Object.values(window.allTablesData).some((tableData) =>
+            tableData.some((row, index) => {
+                if (this.data === tableData && index === excludeIndex) return false;
+                return requiredFields.every((key) => row[key].toLowerCase().trim() === normalizedEntry[key]);
+            })
+        );
+
+        if (isDuplicate) {
+            const errorMessage = action === "add" ? "Duplicate entry found!" : "No changes made.";
+            this.showErrorModal(errorMessage);
+            return false;
+        }
+
+        return true;
     }
 
-    // Normalize the entry for case-insensitive comparison
-    const normalizedEntry = {};
-    requiredFields.forEach((key) => {
-        normalizedEntry[key] = typeof entry[key] === 'string' ? entry[key].toLowerCase().trim() : entry[key];
-    });
-
-    // Check for duplicates across all tables
-    const isDuplicate = Object.values(window.allTablesData).some((tableData) =>
-        tableData.some((row, index) => {
-            if (tableData === this.data && index === excludeIndex) return false; // Skip current entry during editing
-
-            const normalizedRow = {};
-            requiredFields.forEach((key) => {
-                normalizedRow[key] = typeof row[key] === 'string' ? row[key].toLowerCase().trim() : row[key];
-            });
-
-            return requiredFields.every((key) => normalizedRow[key] === normalizedEntry[key]);
-        })
-    );
-
-    if (isDuplicate) {
-       //alert("Duplicate entry found! The animal is already in the table.");
-
-       this.showErrorModal("Duplicate entry found! The animal is already in the table.");
-       return false;
+    showErrorModal(message) {
+        const modalBody = document.querySelector("#errorModal .modal-body");
+        if (modalBody) {
+            modalBody.textContent = message;
+        }
+        const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
+        errorModal.show();
     }
-
-    // return !isDuplicate; // Return true only if no duplicate is found
-    return true; // Validation passed
 }
 
-showErrorModal(message) {
-    // Set the error message dynamically
-    const modalBody = document.querySelector("#errorModal .modal-body");
-    if (modalBody) {
-        modalBody.textContent = message;
-    }
-    // Show the modal using Bootstrap's modal API
-    const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
-    errorModal.show();
-}
-
-    
-    
-}
-
-// Example data initialization
 document.addEventListener("DOMContentLoaded", () => {
     const bigCatsData = [
-        { species: "Big Cats", name: "Tiger", size: "10 ft", location: "Asia", image: "images/tiger.png" },
-        { species: "Big Cats", name: "Lion", size: "8 ft", location: "Africa", image: "images/Lion.png" }
+        { species: "Big Cats", name: "Tiger", size: 10, location: "Asia", image: "images/tiger.png" },
+        { species: "Big Cats", name: "Lion", size: 8, location: "Africa", image: "images/lion.png" },
     ];
     const dogsData = [
-        { species: "Dog", name: "Rottweiler", size: "2 ft", location: "Germany", image: "images/Rotwailer.png" },
-        { species: "Dog", name: "Labrador", size: "2 ft", location: "UK", image: "images/Labrodar.png" }
+        { species: "Dog", name: "Rottweiler", size: 2, location: "Germany", image: "images/Rotwailer.png" },
+        { species: "Dog", name: "Labrador", size: 2, location: "UK", image: "images/Labrador.png" },
     ];
     const bigFishData = [
-        { species: "Big Fish", name: "Humpback Whale", size: "15 ft", location: "Atlantic Ocean", image: "images/HumpbackWhale.png" },
-        { species: "Big Fish", name: "Killer Whale", size: "12 ft", location: "Atlantic Ocean", image: "images/Killer_Whale.png" }
+        { species: "Big Fish", name: "Humpback Whale", size: 15, location: "Atlantic Ocean", image: "images/humpbackwhale.png" },
+        { species: "Big Fish", name: "Killer Whale", size: 12, location: "Atlantic Ocean", image: "images/Killer_Whale.png" },
     ];
 
-    // new AnimalTable(bigCatsData, "bigCatsTable", ["name", "size", "location"]);
-    // new AnimalTable(dogsData, "dogsTable", ["name", "location"]);
-    // new AnimalTable(bigFishData, "bigFishTable", ["size"]);
-
     let count = 0;
-    new AnimalTable(bigCatsData, "bigCatsTable", ["name", "size", "location"],count +=1);
-    new AnimalTable(dogsData, "dogsTable", ["name", "location"], count +=1);
-    new AnimalTable(bigFishData, "bigFishTable", ["size"], count +=1);
-    
-    
+    new AnimalTable(bigCatsData, "bigCatsTable", ["name", "size", "location"], ++count);
+    new AnimalTable(dogsData, "dogsTable", ["name", "location"], ++count);
+    new AnimalTable(bigFishData, "bigFishTable", ["name", "size", "location"], ++count);
 });
 
-
-// Responsive table adjustment for smaller screens
+// Responsive adjustments
 window.addEventListener("resize", () => {
     if (window.innerWidth < 768) {
         document.querySelectorAll(".table").forEach((table) => {
@@ -321,7 +264,6 @@ window.addEventListener("resize", () => {
     }
 });
 
-// Ensure responsiveness on initial load
 if (window.innerWidth < 768) {
     document.querySelectorAll(".table").forEach((table) => {
         table.classList.add("table-responsive");

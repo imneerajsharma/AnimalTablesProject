@@ -24,6 +24,9 @@ body {
     justify-content: center; /* Center the container horizontally */
 }
 
+.table-responsive {
+    margin-bottom: 20px; /* Adds spacing between the tables */
+}
 /* Center and constrain the layout */
 .container {
     max-width: 960px;
@@ -35,6 +38,24 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+/* Specific styles for "Edit" and "Delete" buttons */
+button.edit-btn,
+button.delete-btn {
+    width: 80px; /* Fixed width */
+    height: 36px; /* Fixed height */
+    margin: 5px;
+    padding: 8px 12px;
+    display: inline-block; /* Ensure proper alignment */
+}
+/* Ensure the "Add Animal" button remains unaffected */
+.add-btn {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 10px 20px; /* Keep the padding larger for distinction */
+}
+
+
 
 /* Style for modals */
 .modal-header {
@@ -50,6 +71,18 @@ body {
     font-size: 1rem;
     padding: 10px 15px;
 }
+
+table {
+    table-layout: fixed; /* Ensures fixed width for columns */
+    width: 100%; /* Makes table fill its container */
+}
+
+th, td {
+    word-wrap: break-word; /* Wrap text if it overflows */
+    text-align: center; /* Align text in the center */
+    vertical-align: top; /* Align text to the top */
+}
+
 
 /* Optimize table layout for small screens */
 @media (max-width: 768px) {
@@ -86,3 +119,5 @@ body {
         font-size: 0.75rem;
     }
 }
+
+
